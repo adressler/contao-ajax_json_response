@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * AjaxJsonResponse
+ * Contao extension to enable JSON response on AJAX requests
+ *
+ * @copyright  Armin Dressler
+ * @author     Armin Dressler <dressler.armin at gmail.com>
+ * @package    AjaxJsonResponse
+ * @license    http://www.gnu.org/licenses/lgpl-3.0.html LGPL
+ * @filesource
+ * @see https://github.com/adressler/contao-ajax_json_response
+ */
+
+$arrExcludeKeys = array('header', 'footer', 'main', 'left', 'right', 'sections', 'layout', 'stylesheets', 'head', 'mootools', 'onload');
+
+$arrData = $this->getData();
+
+$arrData = array_diff_key($arrData, array_flip($arrExcludeKeys));
+
+$arrData = array_merge($arrData, array(
+	'title' => sprintf('%s – %s', $this->pageTitle, $this->mainTitle),
+	'header' => $this->replaceInsertTags($this->header),
+	'footer' => $this->replaceInsertTags($this->footer),
+	'main' => $this->replaceInsertTags($this->main),
+	'left' => $this->replaceInsertTags($this->left),
+	'right' => $this->replaceInsertTags($this->right),
+	'request_token' => REQUEST_TOKEN,
+));
+
+foreach ($this->sections as $section => $strHtml)
+{
+	$arrData[$section] = $this->replaceInsertTags($strHtml);
+}
+
+echo json_encode($arrData);
